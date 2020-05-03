@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:shopapp/widgets/cart_item.dart';
 
 class CartItem {
   final String id;
@@ -43,21 +44,21 @@ class Cart with ChangeNotifier {
       _items.update(
         productId,
         (existingCartItem) => CartItem(
-              id: existingCartItem.id,
-              title: existingCartItem.title,
-              price: existingCartItem.price,
-              quantity: existingCartItem.quantity + 1,
-            ),
+          id: existingCartItem.id,
+          title: existingCartItem.title,
+          price: existingCartItem.price,
+          quantity: existingCartItem.quantity + 1,
+        ),
       );
     } else {
       _items.putIfAbsent(
         productId,
         () => CartItem(
-              id: DateTime.now().toString(),
-              title: title,
-              price: price,
-              quantity: 1,
-            ),
+          id: DateTime.now().toString(),
+          title: title,
+          price: price,
+          quantity: 1,
+        ),
       );
     }
     notifyListeners();
@@ -65,6 +66,25 @@ class Cart with ChangeNotifier {
 
   void removeItem(String productId) {
     _items.remove(productId);
+    notifyListeners();
+  }
+
+  void removeSingleItem(String productId) {
+    if (!_items.containsKey(productId)) {
+      return;
+    }
+    if (_items[productId].quantity > 1) {
+      _items.update(
+        productId,
+        (existingCartItem) => CartItem(
+            id: existingCartItem.id,
+            title: existingCartItem.title,
+            price: existingCartItem.price,
+            quantity: existingCartItem.quantity - 1),
+      );
+    } else {
+      _items.remove(productId);
+    }
     notifyListeners();
   }
 
